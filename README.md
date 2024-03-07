@@ -1,66 +1,123 @@
-## Foundry
+# Foundry Introduction Project: **FundMe** 
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## Summary
 
-Foundry consists of:
+A simple fundable smart contract that keeps track of funders and allows the contract-owner to withdraw the funds, built for educational purposes during Cyfrin Updraft's [Foundry Fundamentals](https://updraft.cyfrin.io/courses/foundry) course, using Solidity and Foundry.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Requirements
 
-## Documentation
-
-https://book.getfoundry.sh/
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+  - You'll know you did it right if you can run `git --version` and you see a response like `git version x.x.x`
+- [Foundry](https://getfoundry.sh/)
+  - You'll know you did it right if you can run `forge --version` and you see a response like `forge 0.2.0 (816e00b 2023-03-16T00:05:26.396218Z)`
 
 ## Usage
 
-### Build
+### Deploying 
 
-```shell
-$ forge build
+#### Deploy on Anvil's Local Node
+```
+forge script script/DeployFundMe.s.sol
 ```
 
-### Test
+#### Deploy on a provided testnet
 
-```shell
-$ forge test
+```
+forge script script/DeployFundMe.s.sol --rpc-url <TESTNET_RPC_URL> --private-key <DEV_ONLY_PRIVATE_KEY> --broadcast --verify --etherscan-api-key <ETHERSCAN_API_KEY>
 ```
 
-### Format
+#### Deploy on Anvil using Foundry keystore 
 
-```shell
-$ forge fmt
+```
+forge script script/DeployFundMe.s.sol --rpc-url http://127.0.0.1:8545 --broadcast --account ANVIL_DEV
 ```
 
-### Gas Snapshots
+### Testing
 
-```shell
-$ forge snapshot
+#### Run test suit
+
+```
+forge test
 ```
 
-### Anvil
+#### Run specific test
 
-```shell
-$ anvil
+```
+forge test --match-test <testFunctionName>
 ```
 
-### Deploy
+#### Run tests on a testnet
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+```
+forge test --fork-url <TESTNET_RPC_URL>
 ```
 
-### Cast
+#### Check Test Coverage
 
-```shell
-$ cast <subcommand>
+```
+test coverage
 ```
 
-### Help
+### Interacting (using .env)
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+#### Fund the contract
+
+```
+cast send <FUNDME_CONTRACT_ADDRESS> "fund()" --value 0.1ether --private-key <DEV_ONLY_PRIVATE_KEY>
+```
+
+or
+
+```
+forge script script/Interactions.s.sol --rpc-url sepolia  --private-key <DEV_ONLY_PRIVATE_KEY>  --broadcast
+```
+
+#### Withdraw
+
+```
+cast send <FUNDME_CONTRACT_ADDRESS> "withdraw()" --private-key <DEV_ONLY_PRIVATE_KEY>
+```
+
+#### Get owner
+
+```
+cast call <FUNDME_CONTRACT_ADDRESS> "getOwner()"
+```
+
+#### Estimate Gas
+
+```
+forge snapshot
+```
+
+### Interacting (using Foundry keystore)
+
+#### Get version
+
+```
+cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "getVersion()"
+```
+
+#### Fund the contract
+
+```
+cast send 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "fund()" --value 0.1ether --account ANVIL_DEV
+```
+
+#### Get funder address
+
+```
+cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "getFunder(uint256)" 0
+```
+
+#### Get amount funded
+
+```
+cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "getAddressToAmountFunded(address)" <address>
+```
+
+### Interacting (using Interactions.s.sol)
+
+```
+forge test --match-test testUserCanFundInteraction -vvv
 ```
